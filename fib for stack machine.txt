@@ -1,0 +1,30 @@
+// Fib function in HLL
+function fib(n) {
+	if n <= 1 {
+		return 1
+	} else {
+		return fib(n-1) + fib(n-2)
+	}
+}
+// Fib function in stack assembly
+fib:
+	load 0
+	literal 1
+	less-eq
+	jump-if-else branch-1 branch-2
+
+branch-1:
+	literal 1
+	ret
+
+branch-2:
+	load 0
+	literal 1
+	sub
+	call fib
+	load 0
+	literal 2
+	sub
+	call fib
+	add
+	return

@@ -1,0 +1,26 @@
+function foo(a, b) {
+	var c;
+	var d = 1;
+	c = 5
+	return a * (c + b) - d
+}
+
+// variables and arguments are referred to by an offset from the first parameter
+// A variables offset is determined by going through the functions parameters and text
+// and giving them increasing offsets
+//
+// In the function above, a has offset 0, b has offset 1, c has offset 2, and d has offset 3
+// TODO: How to store amount of parameters in assembly?
+foo:
+	literal 1
+	store 3
+	literal 5
+	store 2
+	load 2
+	load 1
+	add
+	load 0
+	mul
+	load 3
+	sub
+	return
