@@ -1,4 +1,4 @@
-// Fib function in HLL
+// Fib function in pseudocode
 function fib(n) {
 	if n <= 1 {
 		return 1
@@ -6,7 +6,7 @@ function fib(n) {
 		return fib(n-1) + fib(n-2)
 	}
 }
-// Fib function in stack assembly
+// Fib function in stack language
 fib:
 	load 0
 	literal 1
