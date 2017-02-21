@@ -1,0 +1,51 @@
+load $n ( -- x)
+Pushes the value in the $n'th slot of the calling frame to the stack.
+
+store $n (x -- )
+Takes a value from the stack and stores it in the $n'th slot of the calling frame.
+
+literal $x (-- x)
+Pushes $x to the stack.
+
+add ( n1 n2 -- n1+n2)
+Takes two values off the stack, adds them, and pushes the result onto the stack.
+
+sub ( n1 n2 -- n1-n2)
+Takes two values off the stack, subtracts them, and pushes the result onto the stack.
+
+mul ( n1 n2 -- n1*n2)
+Takes two values off the stack, multiplies them, and pushes the result onto the stack.
+
+intdiv ( n1 n2 -- n1//n2)
+Takes two values off the stack, floor divides them, and pushes the result onto the stack.
+
+eq (x1 x2 -- x1==x2)
+Takes two values off the stack and pushes true if they are equal and false otherwise.
+
+less (x1 x2 -- x1<x2)
+Takes two values off the stack and pushes true if x1 < x2 and false otherwise.
+
+greater (x1 x2 -- x1>x2)
+Takes two values off the stack and pushes true if x1 > x2 and false otherwise.
+
+less-eq (x1 x2 -- x1<=x2)
+Takes two values off the stack and pushes true if x1 <= x2 and false otherwise.
+
+greater-eq (x1 x2 -- x1 >= x2)
+Takes two values off the stack and pushes true if x1 >= x2 and false otherwise.
+
+jump $label ( -- )
+Performs an unconditional jump to $label
+
+jump-if $label (b -- )
+If the top of stack is truthy, jump to $label, else do nothing.
+
+jump-if-else $label1 $label2 (b -- )
+If the top of stack is truthy, jump to $label1, else jump to $label2
+
+call $label $n (? -- x)
+Calls $label as a function passing the $n'th values from the stack as arguments.
+When this returns the return values from the function will be on the stack.
+
+return
+Returns from the function to the caller.
