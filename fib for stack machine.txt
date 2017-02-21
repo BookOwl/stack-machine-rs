@@ -21,10 +21,10 @@ branch-2:
 	load 0
 	literal 1
 	sub
-	call fib
+	call fib 1
 	load 0
 	literal 2
 	sub
-	call fib
+	call fib 1
 	add
 	return

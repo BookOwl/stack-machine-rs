@@ -19,7 +19,7 @@ Takes two values off the stack, multiplies them, and pushes the result onto the 
 intdiv ( n1 n2 -- n1//n2)
 Takes two values off the stack, floor divides them, and pushes the result onto the stack.
 
-eq (x1 x2 -- x1==x2)
+equal (x1 x2 -- x1==x2)
 Takes two values off the stack and pushes true if they are equal and false otherwise.
 
 less (x1 x2 -- x1<x2)
