@@ -7,7 +7,7 @@ struct Frame {
     bindings: Vec<Option<Value>>,
 }
 
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Debug, Copy, Clone, PartialEq, PartialOrd)]
 enum Value {
     Int(i32),
     Bool(bool),
@@ -21,12 +21,11 @@ enum Instruction {
     Mul,
     IntDiv,
     Output,
-    Equal,/*
+    Equal,
     Less,
     Greater,
     LessEq,
     GreaterEq,
-    */
 }
 
 #[derive(Debug)]
@@ -118,6 +117,10 @@ fn run(program: Program) -> Result<(), Error> {
                 println!("{:?}", datastack.pop().ok_or(Error::StackUnderflow)?);
             },
             Instruction::Equal => op!(datastack; a, b => Value::Bool(a == b)),
+            Instruction::Less => op!(datastack; a, b => Value::Bool(a < b)),
+            Instruction::Greater => op!(datastack; a, b => Value::Bool(a > b)),
+            Instruction::LessEq => op!(datastack; a, b => Value::Bool(a <= b)),
+            Instruction::GreaterEq => op!(datastack; a, b => Value::Bool(a >= b)),
         };
         ip += 1;
     }
