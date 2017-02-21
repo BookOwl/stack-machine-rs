@@ -13,7 +13,7 @@ enum Value {
     Bool(bool),
 }
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 enum Instruction {
     Literal(Value),
     Add,
@@ -26,6 +26,9 @@ enum Instruction {
     Greater,
     LessEq,
     GreaterEq,
+    Exit,
+    Unreachable,
+    Jump(String)
 }
 
 #[derive(Debug)]
@@ -34,6 +37,20 @@ enum Error {
     InstructionOverflow,
     InvalidTypes,
     NoMain,
+    MissingLabel,
+}
+
+type CallStack = Vec<Frame>;
+type DataStack = Vec<Value>;
+
+struct Program {
+    instructions: Vec<Instruction>,
+    frame_info: HashMap<String, FrameInfo>,
+}
+
+struct FrameInfo {
+    num_bindings: usize,
+    position: usize,
 }
 
 // Macros to assist in writing operations.
@@ -85,19 +102,6 @@ macro_rules! op {
     )
 }
 
-type CallStack = Vec<Frame>;
-type DataStack = Vec<Value>;
-
-struct Program {
-    instructions: Vec<Instruction>,
-    frame_info: HashMap<String, FrameInfo>,
-}
-
-struct FrameInfo {
-    num_bindings: usize,
-    position: usize,
-}
-
 fn run(program: Program) -> Result<(), Error> {
     let mut ipstack: Vec<usize>  = Vec::new();
     let mut callstack: CallStack = Vec::new();
@@ -105,6 +109,7 @@ fn run(program: Program) -> Result<(), Error> {
     let program_len = program.instructions.len();
     let mut current_frame = program.frame_info.get("main").ok_or(Error::NoMain)?;
     let mut ip = current_frame.position;
+    let mut jumped = false;
     while ip < program_len {
         let instruction = program.instructions.get(ip).ok_or(Error::InstructionOverflow)?;
         match *instruction {
@@ -121,8 +126,19 @@ fn run(program: Program) -> Result<(), Error> {
             Instruction::Greater => op!(datastack; a, b => Value::Bool(a > b)),
             Instruction::LessEq => op!(datastack; a, b => Value::Bool(a <= b)),
             Instruction::GreaterEq => op!(datastack; a, b => Value::Bool(a >= b)),
+            Instruction::Exit => break,
+            Instruction::Unreachable => panic!("Unreachable instruction executed! D:"),
+            Instruction::Jump(ref label_name) => {
+                let label = program.frame_info.get(label_name).ok_or(Error::MissingLabel)?;
+                ip = label.position;
+                jumped = true;
+            },
         };
-        ip += 1;
+        if !jumped {
+            ip += 1;
+        } else {
+            jumped = false;
+        }
     }
     Ok(())
 }
@@ -133,12 +149,20 @@ fn main() {
         num_bindings: 0,
         position: 0,
     });
+    frame_info.insert(String::from("foo"), FrameInfo {
+        num_bindings: 0,
+        position: 5,
+    });
     let prog = Program {
             instructions: vec![
                 Instruction::Literal(Value::Int(3)),
                 Instruction::Literal(Value::Int(2)),
                 Instruction::Sub,
+                Instruction::Jump(String::from("foo")),
+                Instruction::Literal(Value::Int(5)),
                 Instruction::Output,
+                Instruction::Exit,
+                Instruction::Unreachable,
             ],
             frame_info: frame_info,
     };
