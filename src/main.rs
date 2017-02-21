@@ -5,9 +5,10 @@ struct Frame {
     num_bindings: usize,
     bindings: Vec<Option<Value>>,
 }
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 enum Value {
     Int(i32),
+    Bool(bool),
 }
 
 #[derive(Debug, Copy, Clone)]
@@ -18,6 +19,12 @@ enum Instruction {
     Mul,
     IntDiv,
     Output,
+    Equal,/*
+    Less,
+    Greater,
+    LessEq,
+    GreaterEq,
+    */
 }
 
 #[derive(Debug)]
@@ -37,7 +44,25 @@ macro_rules! math_op {
                 (Value::Int(n1), Value::Int(n2)) => {
                     ($stack).push(Value::Int($func(n1, n2)))
                 },
-                //_ => return Err(Error::InvalidTypes),
+                _ => return Err(Error::InvalidTypes),
+            }
+        }
+    )
+}
+
+macro_rules! pops {
+    ($stack:ident; $head:pat) => ($stack.pop().ok_or(Error::StackUnderflow)?);
+    ($stack:ident; $head:pat, $($tail:pat),*) => (($stack.pop().ok_or(Error::StackUnderflow)?,
+                                            pops!($stack; $($tail),*)));
+}
+
+macro_rules! op {
+    ($stack: ident; $( $p:pat ),+ => $exp:expr) => (
+        {
+            match pops!($stack; $($p),+) {
+                ($($p),+) => {
+                    ($stack).push($exp)
+                }
             }
         }
     )
@@ -74,7 +99,8 @@ fn run(program: Program) -> Result<(), Error> {
             Instruction::Output => {
                 let val = datastack.pop().ok_or(Error::StackUnderflow)?;
                 println!("{:?}", val);
-            }
+            },
+            Instruction::Equal => op!(datastack; a, b => Value::Bool(a == b)),
         };
         ip += 1;
     }
@@ -98,6 +124,8 @@ fn main() {
                 Instruction::Sub,
                 Instruction::Literal(Value::Int(2)),
                 Instruction::IntDiv,
+                Instruction::Literal(Value::Int(1)),
+                Instruction::Equal,
                 Instruction::Output,
             ],
             frame_info: frame_info,
